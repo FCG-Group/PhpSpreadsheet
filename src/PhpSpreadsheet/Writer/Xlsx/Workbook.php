@@ -153,6 +153,13 @@ class Workbook extends WriterPart
                 $objWriter->writeAttribute('workbookPassword', $spreadsheet->getSecurity()->getWorkbookPassword());
             }
 
+            if (!empty($spreadsheet->unparsedLoadedData['workbookProtection']['workbookAlgorithmName'])) {
+                $objWriter->writeAttribute('workbookAlgorithmName', $spreadsheet->unparsedLoadedData['workbookProtection']['workbookAlgorithmName']);
+                $objWriter->writeAttribute('workbookHashValue', $spreadsheet->unparsedLoadedData['workbookProtection']['workbookHashValue']);
+                $objWriter->writeAttribute('workbookSaltValue', $spreadsheet->unparsedLoadedData['workbookProtection']['workbookSaltValue']);
+                $objWriter->writeAttribute('workbookSpinCount', $spreadsheet->unparsedLoadedData['workbookProtection']['workbookSpinCount']);
+            }
+
             $objWriter->endElement();
         }
     }

@@ -1191,6 +1191,12 @@ class Worksheet extends WriterPart
             $objWriter->writeAttribute('r:id', 'rId_comments_vml1');
             $objWriter->endElement();
         }
+
+        if (!empty($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'])) {
+            foreach ($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'] as $legacyDrawing) {
+                $objWriter->writeRaw($legacyDrawing);
+            }
+        }
     }
 
     /**
