@@ -385,6 +385,17 @@ class Xlsx extends BaseReader
                     }
 
                     break;
+
+                case 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain':
+                    $rId = substr($rel['Id'], 3);  // rIdXXX
+                    $unparsedCalcChain = &$excel->unparsedLoadedData['workbook_rels']['calcChain'];
+                    $unparsedCalcChain[$rId] = [];
+                    $unparsedCalcChain[$rId]['contentType'] = $rel['Type'];
+                    $unparsedCalcChain[$rId]['fileName'] = $rel['Target'];
+                    $unparsedCalcChain[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, 'xl/' . $rel['Target']));
+                    unset($unparsedCalcChain);
+
+                    break;
             }
         }
 
@@ -671,6 +682,14 @@ class Xlsx extends BaseReader
                         }
                         if ($xmlWorkbook->workbookProtection['workbookPassword']) {
                             $excel->getSecurity()->setWorkbookPassword((string) $xmlWorkbook->workbookProtection['workbookPassword'], true);
+                        }
+
+                        // unparsed
+                        if ($xmlWorkbook->workbookProtection['workbookAlgorithmName']) {
+                            $excel->unparsedLoadedData['workbookProtection']['workbookAlgorithmName'] = (string) $xmlWorkbook->workbookProtection['workbookAlgorithmName'];
+                            $excel->unparsedLoadedData['workbookProtection']['workbookHashValue'] = (string) $xmlWorkbook->workbookProtection['workbookHashValue'];
+                            $excel->unparsedLoadedData['workbookProtection']['workbookSaltValue'] = (string) $xmlWorkbook->workbookProtection['workbookSaltValue'];
+                            $excel->unparsedLoadedData['workbookProtection']['workbookSpinCount'] = (string) $xmlWorkbook->workbookProtection['workbookSpinCount'];
                         }
                     }
 
@@ -1295,6 +1314,15 @@ class Xlsx extends BaseReader
                                             $docValidation->setFormula1((string) $dataValidation->formula1);
                                             $docValidation->setFormula2((string) $dataValidation->formula2);
                                         }
+                                    }
+                                }
+                            }
+
+                            // unparsed sheet legacyDrawing
+                            if ($xmlSheet) {
+                                if ($xmlSheet->legacyDrawing) {
+                                    foreach ($xmlSheet->legacyDrawing as $legacyDrawing) {
+                                        $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['legacyDrawing'][] = $legacyDrawing->asXML();
                                     }
                                 }
                             }
@@ -2027,6 +2055,7 @@ class Xlsx extends BaseReader
 
                     // unparsed
                     case 'application/vnd.ms-excel.controlproperties+xml':
+                    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml':
                         $excel->unparsedLoadedData['override_content_types'][(string) $contentType['PartName']] = (string) $contentType['ContentType'];
 
                         break;
@@ -2260,6 +2289,8 @@ class Xlsx extends BaseReader
                             (isset($run->rPr->strike) && !isset($run->rPr->strike['val']))) {
                             $objText->getFont()->setStrikethrough(true);
                         }
+                    } else {
+                        $value->createText(StringHelper::controlCharacterOOXML2PHP((string) $run->t));
                     }
                 }
             }

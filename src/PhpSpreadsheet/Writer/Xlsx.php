@@ -272,6 +272,13 @@ class Xlsx extends BaseWriter
             // Add styles to ZIP file
             $zip->addFromString('xl/styles.xml', $this->getWriterPart('Style')->writeStyles($this->spreadSheet));
 
+            // Add calcChain to ZIP file
+            if (isset($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
+                foreach ($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
+                    $zip->addFromString('xl/' . $unparsedCalcChain['fileName'], $unparsedCalcChain['content']);
+                }
+            }
+
             // Add workbook to ZIP file
             $zip->addFromString('xl/workbook.xml', $this->getWriterPart('Workbook')->writeWorkbook($this->spreadSheet, $this->preCalculateFormulas));
 

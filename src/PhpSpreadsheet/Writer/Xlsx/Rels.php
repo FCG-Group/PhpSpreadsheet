@@ -134,28 +134,45 @@ class Rels extends WriterPart
             'sharedStrings.xml'
         );
 
+        $idxShift = 4;
+
         // Relationships with sheets
         $sheetCount = $spreadsheet->getSheetCount();
         for ($i = 0; $i < $sheetCount; ++$i) {
             $this->writeRelationship(
                 $objWriter,
-                ($i + 1 + 3),
+                ($i + $idxShift),
                 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet',
                 'worksheets/sheet' . ($i + 1) . '.xml'
             );
         }
+
+        $idxShift = ($i + $idxShift);
+
         // Relationships for vbaProject if needed
         // id : just after the last sheet
         if ($spreadsheet->hasMacros()) {
             $this->writeRelationShip(
                 $objWriter,
-                ($i + 1 + 3),
+                $idxShift++,
                 'http://schemas.microsoft.com/office/2006/relationships/vbaProject',
                 'vbaProject.bin'
             );
-            ++$i; //increment i if needed for an another relation
         }
 
+        // Relationships for calcChain if needed
+        /*
+                // looks like we need to fix sheet ids before put it here... :/
+                if (isset($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
+                    foreach ($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain)
+                    $this->writeRelationShip(
+                        $objWriter,
+                        $idxShift++,
+                        $unparsedCalcChain["contentType"],
+                        $unparsedCalcChain["fileName"]
+                    );
+                }
+        */
         $objWriter->endElement();
 
         return $objWriter->getData();
