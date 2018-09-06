@@ -275,7 +275,19 @@ class Xlsx extends BaseWriter
             // Add calcChain to ZIP file
             if (isset($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
                 foreach ($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
-                    $zip->addFromString('xl/' . $unparsedCalcChain['fileName'], $unparsedCalcChain['content']);
+                    // fix sheet Ids
+                    $xmlCalcChain = simplexml_load_string(
+                        $unparsedCalcChain['content'],
+                        'SimpleXMLElement',
+                        \PhpOffice\PhpSpreadsheet\Settings::getLibXmlLoaderOptions()
+                    );
+                    foreach ($xmlCalcChain->c as $chainCell) {
+                        $oldSheetId = (string) $chainCell['i'];
+                        $chainCell['i'] = $this->spreadSheet->unparsedLoadedData['convertedSheetIds'][$oldSheetId];
+                    }
+
+                    // put converted calcChain
+                    $zip->addFromString('xl/' . $unparsedCalcChain['fileName'], $xmlCalcChain->asXML());
                 }
             }
 
