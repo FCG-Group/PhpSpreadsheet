@@ -165,8 +165,9 @@ class Worksheet extends WriterPart
         $objWriter->writeAttribute('summaryRight', ($pSheet->getShowSummaryRight() ? '1' : '0'));
         $objWriter->endElement();
 
-        // pageSetUpPr
-        if ($pSheet->getPageSetup()->getFitToPage()) {
+        // pageSetUpPr (allow only if we have fitToWidth or/and fitToHeight, otherwise Excel 2010 don't like it)
+        if ($pSheet->getPageSetup()->getFitToPage() &&
+            ($pSheet->getPageSetup()->getFitToWidth() > 0 || $pSheet->getPageSetup()->getFitToHeight() > 0)) {
             $objWriter->startElement('pageSetUpPr');
             $objWriter->writeAttribute('fitToPage', '1');
             $objWriter->endElement();
@@ -1166,14 +1167,14 @@ class Worksheet extends WriterPart
         // If sheet contains drawings, add the relationships
         $objWriter->startElement('drawing');
 
-        $rId = 'rId1';
+        $rId = '1';
         if (isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'])) {
             $drawingOriginalIds = $pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'];
             // take first. In future can be overriten
-            $rId = reset($drawingOriginalIds);
+            $rId = reset($drawingOriginalIds);			// lets use as is and allow to get 'rIdrId1', because at Rels.php:writeWorksheetRelationships() we have same result
         }
 
-        $objWriter->writeAttribute('r:id', $rId);
+        $objWriter->writeAttribute('r:id', 'rId_drawing_' . $rId);
         $objWriter->endElement();
     }
 

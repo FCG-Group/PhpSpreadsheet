@@ -226,11 +226,11 @@ class Rels extends WriterPart
             $relPath = '../drawings/drawing' . $pWorksheetId . '.xml';
             $rId = ++$d;
             if (isset($drawingOriginalIds[$relPath])) {
-                $rId = (int) (substr($drawingOriginalIds[$relPath], 3));
+                $rId = $drawingOriginalIds[$relPath];
             }
             $this->writeRelationship(
                 $objWriter,
-                $rId,
+                '_drawing_' . $rId,
                 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing',
                 $relPath
             );
