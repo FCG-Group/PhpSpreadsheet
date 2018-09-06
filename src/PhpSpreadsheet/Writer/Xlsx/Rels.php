@@ -161,18 +161,17 @@ class Rels extends WriterPart
         }
 
         // Relationships for calcChain if needed
-        /*
-                // looks like we need to fix sheet ids before put it here... :/
-                if (isset($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
-                    foreach ($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain)
-                    $this->writeRelationShip(
-                        $objWriter,
-                        $idxShift++,
-                        $unparsedCalcChain["contentType"],
-                        $unparsedCalcChain["fileName"]
-                    );
-                }
-        */
+        if (isset($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
+            foreach ($spreadsheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
+                $this->writeRelationShip(
+                $objWriter,
+                $idxShift++,
+                $unparsedCalcChain['contentType'],
+                $unparsedCalcChain['fileName']
+            );
+            }
+        }
+
         $objWriter->endElement();
 
         return $objWriter->getData();

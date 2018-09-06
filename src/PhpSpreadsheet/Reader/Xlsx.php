@@ -723,6 +723,7 @@ class Xlsx extends BaseReader
                             // Map old sheet id in original workbook to new sheet id.
                             // They will differ if loadSheetsOnly() is being used
                             $mapSheetId[$oldSheetId] = $oldSheetId - $countSkippedSheets;
+                            $excel->unparsedLoadedData['convertedSheetIds'][(string) $eleSheet['sheetId']] = $sheetId + 1;
 
                             // Load sheet
                             $docSheet = $excel->createSheet();
