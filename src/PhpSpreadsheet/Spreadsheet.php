@@ -127,12 +127,12 @@ class Spreadsheet
     private $ribbonBinObjects;
 
     /**
-     * unparsedLoadedData : list of unparsed loaded data for export to same format with better compatibility
-     * has to be minimized, when the library start to support currently unparsed data.
+     * List of unparsed loaded data for export to same format with better compatibility.
+     * It has to be minimized when the library start to support currently unparsed data.
      *
      * @var array
      */
-    public $unparsedLoadedData = [];
+    private $unparsedLoadedData = [];
 
     /**
      * Controls visibility of the horizonal scroll bar in the application.

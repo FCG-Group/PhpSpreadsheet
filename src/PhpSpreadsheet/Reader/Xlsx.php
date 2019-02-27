@@ -449,13 +449,13 @@ class Xlsx extends BaseReader
                     break;
 
                 case 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain':
-                    $rId = substr($rel['Id'], 3);  // rIdXXX
-                    $unparsedCalcChain = &$excel->unparsedLoadedData['workbook_rels']['calcChain'];
+					$rId = substr($rel['Id'], 3);  // rIdXXX
+                    $unparsedCalcChain = &$unparsedLoadedData['workbook_rels']['calcChain'];
                     $unparsedCalcChain[$rId] = [];
                     $unparsedCalcChain[$rId]['contentType'] = $rel['Type'];
                     $unparsedCalcChain[$rId]['fileName'] = $rel['Target'];
                     $unparsedCalcChain[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, 'xl/' . $rel['Target']));
-                    unset($unparsedCalcChain);
+					unset($unparsedCalcChain);
 
                     break;
             }
@@ -753,8 +753,8 @@ class Xlsx extends BaseReader
 
                             // Map old sheet id in original workbook to new sheet id.
                             // They will differ if loadSheetsOnly() is being used
-                            $mapSheetId[$oldSheetId] = $oldSheetId - $countSkippedSheets;
-                            $excel->unparsedLoadedData['convertedSheetIds'][(string) $eleSheet['sheetId']] = $sheetId + 1;
+							$mapSheetId[$oldSheetId] = $oldSheetId - $countSkippedSheets;
+							$unparsedLoadedData['convertedSheetIds'][(string) $eleSheet['sheetId']] = $sheetId + 1;
 
                             // Load sheet
                             $docSheet = $excel->createSheet();
@@ -1248,7 +1248,7 @@ class Xlsx extends BaseReader
 
                                 $relAttributes = $xmlSheet->pageSetup->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships');
                                 if (isset($relAttributes['id'])) {
-                                    $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['pageSetupRelId'] = (string) $relAttributes['id'];
+									$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['pageSetupRelId'] = (string) $relAttributes['id'];
                                 }
                             }
 
@@ -1337,7 +1337,7 @@ class Xlsx extends BaseReader
                             if ($xmlSheet) {
                                 if ($xmlSheet->legacyDrawing) {
                                     foreach ($xmlSheet->legacyDrawing as $legacyDrawing) {
-                                        $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['legacyDrawing'][] = $legacyDrawing->asXML();
+                                        $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['legacyDrawing'][] = $legacyDrawing->asXML();
                                     }
                                 }
                             }
@@ -1347,7 +1347,7 @@ class Xlsx extends BaseReader
                                 $mc = $xmlSheet->children('http://schemas.openxmlformats.org/markup-compatibility/2006');
                                 if ($mc->AlternateContent) {
                                     foreach ($mc->AlternateContent as $alternateContent) {
-                                        $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['AlternateContents'][] = $alternateContent->asXML();
+                                        $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['AlternateContents'][] = $alternateContent->asXML();
                                     }
                                 }
                             }
@@ -1529,7 +1529,7 @@ class Xlsx extends BaseReader
                                 if ($unparsedVmlDrawings) {
                                     foreach ($unparsedVmlDrawings as $rId => $relPath) {
                                         $rId = substr($rId, 3);  // rIdXXX
-                                        $unparsedVmlDrawing = &$excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['vmlDrawings'];
+                                        $unparsedVmlDrawing = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['vmlDrawings'];
                                         $unparsedVmlDrawing[$rId] = [];
                                         $unparsedVmlDrawing[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $relPath);
                                         $unparsedVmlDrawing[$rId]['relFilePath'] = $relPath;
@@ -1797,10 +1797,10 @@ class Xlsx extends BaseReader
                                     }
 
                                     // store original rId of drawing files
-                                    $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'] = [];
+                                    $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'] = [];
                                     foreach ($relsWorksheet->Relationship as $ele) {
                                         if ($ele['Type'] == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing') {
-                                            $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'][(string) $ele['Target']] = (string) $ele['Id'];
+                                            $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'][(string) $ele['Target']] = (string) $ele['Id'];
                                         }
                                     }
 
@@ -1813,7 +1813,7 @@ class Xlsx extends BaseReader
 
                                     if ($xmlAltDrawing->AlternateContent) {
                                         foreach ($xmlAltDrawing->AlternateContent as $alternateContent) {
-                                            $excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingAlternateContents'][] = $alternateContent->asXML();
+                                            $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingAlternateContents'][] = $alternateContent->asXML();
                                         }
                                     }
                                 }
@@ -1836,7 +1836,7 @@ class Xlsx extends BaseReader
                                     }
                                 }
 
-                                $unparsedCtrlProps = &$excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['ctrlProps'];
+                                $unparsedCtrlProps = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['ctrlProps'];
                                 foreach ($ctrlProps as $rId => $ctrlProp) {
                                     $rId = substr($rId, 3);  // rIdXXX
                                     $unparsedCtrlProps[$rId] = [];
@@ -1864,7 +1864,7 @@ class Xlsx extends BaseReader
                                     }
                                 }
 
-                                $unparsedPrinterSettings = &$excel->unparsedLoadedData['sheets'][$docSheet->getCodeName()]['printerSettings'];
+                                $unparsedPrinterSettings = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['printerSettings'];
                                 foreach ($sheetPrinterSettings as $rId => $printerSettings) {
                                     $rId = substr($rId, 3);  // rIdXXX
                                     $unparsedPrinterSettings[$rId] = [];
@@ -2091,7 +2091,7 @@ class Xlsx extends BaseReader
             foreach ($contentTypes->Default as $contentType) {
                 switch ($contentType['ContentType']) {
                     case 'application/vnd.openxmlformats-officedocument.spreadsheetml.printerSettings':
-                        $excel->unparsedLoadedData['default_content_types'][(string) $contentType['Extension']] = (string) $contentType['ContentType'];
+                        $unparsedLoadedData['default_content_types'][(string) $contentType['Extension']] = (string) $contentType['ContentType'];
 
                         break;
                 }
@@ -2128,7 +2128,7 @@ class Xlsx extends BaseReader
                     // unparsed
                     case 'application/vnd.ms-excel.controlproperties+xml':
                     case 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml':
-                        $excel->unparsedLoadedData['override_content_types'][(string) $contentType['PartName']] = (string) $contentType['ContentType'];
+                        $unparsedLoadedData['override_content_types'][(string) $contentType['PartName']] = (string) $contentType['ContentType'];
 
                         break;
                 }

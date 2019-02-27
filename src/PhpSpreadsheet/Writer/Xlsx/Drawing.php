@@ -64,9 +64,10 @@ class Drawing extends WriterPart
             }
         }
 
-        // unparsed AlternateContent
-        if (isset($pWorksheet->getParent()->unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingAlternateContents'])) {
-            foreach ($pWorksheet->getParent()->unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingAlternateContents'] as $drawingAlternateContent) {
+		// unparsed AlternateContent
+		$unparsedLoadedData = $pWorksheet->getParent()->getUnparsedLoadedData();
+        if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingAlternateContents'])) {
+            foreach ($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingAlternateContents'] as $drawingAlternateContent) {
                 $objWriter->writeRaw($drawingAlternateContent);
             }
         }

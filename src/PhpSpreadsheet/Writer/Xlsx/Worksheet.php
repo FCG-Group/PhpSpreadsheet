@@ -854,8 +854,9 @@ class Worksheet extends WriterPart
             $objWriter->writeAttribute('useFirstPageNumber', '1');
         }
 
-        if (isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId'])) {
-            $objWriter->writeAttribute('r:id', $pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId']);
+		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        if (isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId'])) {
+            $objWriter->writeAttribute('r:id', $unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId']);
         }
 
 
@@ -1160,7 +1161,7 @@ class Worksheet extends WriterPart
      */
     private function writeDrawings(XMLWriter $objWriter, PhpspreadsheetWorksheet $pSheet, $includeCharts = false)
     {
-        $hasUnparsedDrawing = isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds']);
+		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
         $hasUnparsedDrawing = isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds']);
         $chartCount = ($includeCharts) ? $pSheet->getChartCollection()->count() : 0;
         if ($chartCount == 0 && $pSheet->getDrawingCollection()->count() == 0 && !$hasUnparsedDrawing) {
@@ -1171,8 +1172,8 @@ class Worksheet extends WriterPart
         $objWriter->startElement('drawing');
 
         $rId = '1';
-        if (isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'])) {
-            $drawingOriginalIds = $pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'];
+        if (isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'])) {
+            $drawingOriginalIds = $unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds'];
             // take first. In future can be overriten
             $rId = reset($drawingOriginalIds);			// lets use as is and allow to get 'rIdrId1', because at Rels.php:writeWorksheetRelationships() we have same result
         }
@@ -1196,8 +1197,9 @@ class Worksheet extends WriterPart
             $objWriter->endElement();
         }
 
-        if (!empty($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'])) {
-            foreach ($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'] as $legacyDrawing) {
+		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        if (!empty($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'])) {
+            foreach ($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'] as $legacyDrawing) {
                 $objWriter->writeRaw($legacyDrawing);
             }
         }
@@ -1221,11 +1223,12 @@ class Worksheet extends WriterPart
 
     private function writeAlternateContent(XMLWriter $objWriter, PhpspreadsheetWorksheet $pSheet)
     {
-        if (empty($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['AlternateContents'])) {
+		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        if (empty($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['AlternateContents'])) {
             return;
         }
 
-        foreach ($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['AlternateContents'] as $alternateContent) {
+        foreach ($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['AlternateContents'] as $alternateContent) {
             $objWriter->writeRaw($alternateContent);
         }
     }

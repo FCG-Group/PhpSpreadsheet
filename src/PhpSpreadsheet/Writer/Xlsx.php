@@ -176,6 +176,8 @@ class Xlsx extends BaseWriter
             // garbage collect
             $this->spreadSheet->garbageCollect();
 
+			$unparsedLoadedData = $this->spreadSheet->getUnparsedLoadedData();
+
             // If $pFilename is php://output or php://stdout, make it a temporary file...
             $originalFilename = $pFilename;
             if (strtolower($pFilename) == 'php://output' || strtolower($pFilename) == 'php://stdout') {
@@ -272,9 +274,9 @@ class Xlsx extends BaseWriter
             // Add styles to ZIP file
             $zip->addFromString('xl/styles.xml', $this->getWriterPart('Style')->writeStyles($this->spreadSheet));
 
-            // Add calcChain to ZIP file
-            if (isset($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'])) {
-                foreach ($this->spreadSheet->unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
+			// Add calcChain to ZIP file
+            if (isset($unparsedLoadedData['workbook_rels']['calcChain'])) {
+                foreach ($unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
                     // fix sheet Ids
                     $xmlCalcChain = simplexml_load_string(
                         $unparsedCalcChain['content'],
@@ -283,7 +285,7 @@ class Xlsx extends BaseWriter
                     );
                     foreach ($xmlCalcChain->c as $chainCell) {
                         $oldSheetId = (string) $chainCell['i'];
-                        $chainCell['i'] = $this->spreadSheet->unparsedLoadedData['convertedSheetIds'][$oldSheetId];
+                        $chainCell['i'] = $unparsedLoadedData['convertedSheetIds'][$oldSheetId];
                     }
 
                     // put converted calcChain
@@ -316,14 +318,14 @@ class Xlsx extends BaseWriter
                 $zip->addFromString('xl/worksheets/_rels/sheet' . ($i + 1) . '.xml.rels', $this->getWriterPart('Rels')->writeWorksheetRelationships($this->spreadSheet->getSheet($i), ($i + 1), $this->includeCharts));
 
                 // Add unparsedLoadedData
-                $sheetCodeName = $this->spreadSheet->getSheet($i)->getCodeName();
-                if (isset($this->spreadSheet->unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'])) {
-                    foreach ($this->spreadSheet->unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'] as $ctrlProp) {
+				$sheetCodeName = $this->spreadSheet->getSheet($i)->getCodeName();
+                if (isset($unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'])) {
+                    foreach ($unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'] as $ctrlProp) {
                         $zip->addFromString($ctrlProp['filePath'], $ctrlProp['content']);
                     }
                 }
-                if (isset($this->spreadSheet->unparsedLoadedData['sheets'][$sheetCodeName]['printerSettings'])) {
-                    foreach ($this->spreadSheet->unparsedLoadedData['sheets'][$sheetCodeName]['printerSettings'] as $ctrlProp) {
+                if (isset($unparsedLoadedData['sheets'][$sheetCodeName]['printerSettings'])) {
+                    foreach ($unparsedLoadedData['sheets'][$sheetCodeName]['printerSettings'] as $ctrlProp) {
                         $zip->addFromString($ctrlProp['filePath'], $ctrlProp['content']);
                     }
                 }
@@ -342,7 +344,7 @@ class Xlsx extends BaseWriter
 
                     // Drawings
                     $zip->addFromString('xl/drawings/drawing' . ($i + 1) . '.xml', $this->getWriterPart('Drawing')->writeDrawings($this->spreadSheet->getSheet($i), $this->includeCharts));
-                } elseif (isset($this->spreadSheet->unparsedLoadedData['sheets'][$sheetCodeName]['drawingAlternateContents'])) {
+                } elseif (isset($unparsedLoadedData['sheets'][$sheetCodeName]['drawingAlternateContents'])) {
                     // Drawings
                     $zip->addFromString('xl/drawings/drawing' . ($i + 1) . '.xml', $this->getWriterPart('Drawing')->writeDrawings($this->spreadSheet->getSheet($i), $this->includeCharts));
                 }
@@ -357,8 +359,8 @@ class Xlsx extends BaseWriter
                 }
 
                 // Add unparsed relationship parts
-                if (isset($this->spreadSheet->unparsedLoadedData['sheets'][$this->spreadSheet->getSheet($i)->getCodeName()]['vmlDrawings'])) {
-                    foreach ($this->spreadSheet->unparsedLoadedData['sheets'][$this->spreadSheet->getSheet($i)->getCodeName()]['vmlDrawings'] as $vmlDrawing) {
+                if (isset($unparsedLoadedData['sheets'][$this->spreadSheet->getSheet($i)->getCodeName()]['vmlDrawings'])) {
+                    foreach ($unparsedLoadedData['sheets'][$this->spreadSheet->getSheet($i)->getCodeName()]['vmlDrawings'] as $vmlDrawing) {
                         $zip->addFromString($vmlDrawing['filePath'], $vmlDrawing['content']);
                     }
                 }
