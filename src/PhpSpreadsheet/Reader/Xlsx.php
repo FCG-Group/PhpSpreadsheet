@@ -449,13 +449,13 @@ class Xlsx extends BaseReader
                     break;
 
                 case 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain':
-					$rId = substr($rel['Id'], 3);  // rIdXXX
+                    $rId = substr($rel['Id'], 3);  // rIdXXX
                     $unparsedCalcChain = &$unparsedLoadedData['workbook_rels']['calcChain'];
                     $unparsedCalcChain[$rId] = [];
                     $unparsedCalcChain[$rId]['contentType'] = $rel['Type'];
                     $unparsedCalcChain[$rId]['fileName'] = $rel['Target'];
                     $unparsedCalcChain[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, 'xl/' . $rel['Target']));
-					unset($unparsedCalcChain);
+                    unset($unparsedCalcChain);
 
                     break;
             }
@@ -753,8 +753,8 @@ class Xlsx extends BaseReader
 
                             // Map old sheet id in original workbook to new sheet id.
                             // They will differ if loadSheetsOnly() is being used
-							$mapSheetId[$oldSheetId] = $oldSheetId - $countSkippedSheets;
-							$unparsedLoadedData['convertedSheetIds'][(string) $eleSheet['sheetId']] = $sheetId + 1;
+                            $mapSheetId[$oldSheetId] = $oldSheetId - $countSkippedSheets;
+                            $unparsedLoadedData['convertedSheetIds'][(string) $eleSheet['sheetId']] = $sheetId + 1;
 
                             // Load sheet
                             $docSheet = $excel->createSheet();
@@ -1141,7 +1141,7 @@ class Xlsx extends BaseReader
                                                     ],
                                                     (string) $dateGroupItem['dateTimeGrouping']
                                                 )
-                                                    ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_DATEGROUP);
+                                                ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_DATEGROUP);
                                             }
                                         }
                                         //    Check for custom filters
@@ -1158,7 +1158,7 @@ class Xlsx extends BaseReader
                                                     (string) $filterRule['operator'],
                                                     (string) $filterRule['val']
                                                 )
-                                                    ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_CUSTOMFILTER);
+                                                ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_CUSTOMFILTER);
                                             }
                                         }
                                         //    Check for dynamic filters
@@ -1172,7 +1172,7 @@ class Xlsx extends BaseReader
                                                     (string) $filterRule['val'],
                                                     (string) $filterRule['type']
                                                 )
-                                                    ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_DYNAMICFILTER);
+                                                ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_DYNAMICFILTER);
                                                 if (isset($filterRule['val'])) {
                                                     $column->setAttribute('val', (string) $filterRule['val']);
                                                 }
@@ -1197,7 +1197,7 @@ class Xlsx extends BaseReader
                                                         : Column\Rule::AUTOFILTER_COLUMN_RULE_TOPTEN_BOTTOM
                                                     )
                                                 )
-                                                    ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_TOPTENFILTER);
+                                                ->setRuleType(Column\Rule::AUTOFILTER_RULETYPE_TOPTENFILTER);
                                             }
                                         }
                                     }
@@ -1248,7 +1248,7 @@ class Xlsx extends BaseReader
 
                                 $relAttributes = $xmlSheet->pageSetup->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships');
                                 if (isset($relAttributes['id'])) {
-									$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['pageSetupRelId'] = (string) $relAttributes['id'];
+                                    $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['pageSetupRelId'] = (string) $relAttributes['id'];
                                 }
                             }
 
@@ -2365,8 +2365,6 @@ class Xlsx extends BaseReader
                             (isset($run->rPr->strike) && !isset($run->rPr->strike['val']))) {
                             $objText->getFont()->setStrikethrough(true);
                         }
-                    } else {
-                        $value->createText(StringHelper::controlCharacterOOXML2PHP((string) $run->t));
                     }
                 }
             }

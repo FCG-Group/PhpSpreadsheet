@@ -176,7 +176,7 @@ class Xlsx extends BaseWriter
             // garbage collect
             $this->spreadSheet->garbageCollect();
 
-			$unparsedLoadedData = $this->spreadSheet->getUnparsedLoadedData();
+            $unparsedLoadedData = $this->spreadSheet->getUnparsedLoadedData();
 
             // If $pFilename is php://output or php://stdout, make it a temporary file...
             $originalFilename = $pFilename;
@@ -274,7 +274,7 @@ class Xlsx extends BaseWriter
             // Add styles to ZIP file
             $zip->addFromString('xl/styles.xml', $this->getWriterPart('Style')->writeStyles($this->spreadSheet));
 
-			// Add calcChain to ZIP file
+            // Add calcChain to ZIP file
             if (isset($unparsedLoadedData['workbook_rels']['calcChain'])) {
                 foreach ($unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
                     // fix sheet Ids
@@ -318,7 +318,7 @@ class Xlsx extends BaseWriter
                 $zip->addFromString('xl/worksheets/_rels/sheet' . ($i + 1) . '.xml.rels', $this->getWriterPart('Rels')->writeWorksheetRelationships($this->spreadSheet->getSheet($i), ($i + 1), $this->includeCharts));
 
                 // Add unparsedLoadedData
-				$sheetCodeName = $this->spreadSheet->getSheet($i)->getCodeName();
+                $sheetCodeName = $this->spreadSheet->getSheet($i)->getCodeName();
                 if (isset($unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'])) {
                     foreach ($unparsedLoadedData['sheets'][$sheetCodeName]['ctrlProps'] as $ctrlProp) {
                         $zip->addFromString($ctrlProp['filePath'], $ctrlProp['content']);
@@ -329,7 +329,6 @@ class Xlsx extends BaseWriter
                         $zip->addFromString($ctrlProp['filePath'], $ctrlProp['content']);
                     }
                 }
-
 
                 $drawings = $this->spreadSheet->getSheet($i)->getDrawingCollection();
                 $drawingCount = count($drawings);

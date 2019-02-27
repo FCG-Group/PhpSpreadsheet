@@ -854,11 +854,10 @@ class Worksheet extends WriterPart
             $objWriter->writeAttribute('useFirstPageNumber', '1');
         }
 
-		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        $unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
         if (isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId'])) {
             $objWriter->writeAttribute('r:id', $unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId']);
         }
-
 
         $objWriter->endElement();
     }
@@ -1161,7 +1160,7 @@ class Worksheet extends WriterPart
      */
     private function writeDrawings(XMLWriter $objWriter, PhpspreadsheetWorksheet $pSheet, $includeCharts = false)
     {
-		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        $unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
         $hasUnparsedDrawing = isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds']);
         $chartCount = ($includeCharts) ? $pSheet->getChartCollection()->count() : 0;
         if ($chartCount == 0 && $pSheet->getDrawingCollection()->count() == 0 && !$hasUnparsedDrawing) {
@@ -1197,7 +1196,7 @@ class Worksheet extends WriterPart
             $objWriter->endElement();
         }
 
-		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        $unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
         if (!empty($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'])) {
             foreach ($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['legacyDrawing'] as $legacyDrawing) {
                 $objWriter->writeRaw($legacyDrawing);
@@ -1223,7 +1222,7 @@ class Worksheet extends WriterPart
 
     private function writeAlternateContent(XMLWriter $objWriter, PhpspreadsheetWorksheet $pSheet)
     {
-		$unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
+        $unparsedLoadedData = $pSheet->getParent()->getUnparsedLoadedData();
         if (empty($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['AlternateContents'])) {
             return;
         }

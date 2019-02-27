@@ -153,7 +153,7 @@ class Workbook extends WriterPart
                 $objWriter->writeAttribute('workbookPassword', $spreadsheet->getSecurity()->getWorkbookPassword());
             }
 
-			$unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
+            $unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
             if (!empty($unparsedLoadedData['workbookProtection']['workbookAlgorithmName'])) {
                 $objWriter->writeAttribute('workbookAlgorithmName', $unparsedLoadedData['workbookProtection']['workbookAlgorithmName']);
                 $objWriter->writeAttribute('workbookHashValue', $unparsedLoadedData['workbookProtection']['workbookHashValue']);

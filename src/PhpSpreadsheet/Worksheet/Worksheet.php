@@ -1251,7 +1251,7 @@ class Worksheet implements IComparable
         if ($aCoordinates[1] > $this->cachedHighestRow) {
             $this->cachedHighestRow = $aCoordinates[1];
         }
-        
+
         // Cell needs appropriate xfIndex from dimensions records
         //    but don't create dimension records if they don't already exist
         $rowDimension = $this->getRowDimension($aCoordinates[1], false);
@@ -1269,7 +1269,6 @@ class Worksheet implements IComparable
     }
 
     /**
-
      * Does the cell at a specific coordinate exist?
      *
      * @param string $pCoordinate Coordinate of the cell eg: 'A1'

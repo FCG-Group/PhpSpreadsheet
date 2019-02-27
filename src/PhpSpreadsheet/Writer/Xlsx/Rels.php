@@ -160,8 +160,8 @@ class Rels extends WriterPart
             );
         }
 
-		// Relationships for calcChain if needed
-		$unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
+        // Relationships for calcChain if needed
+        $unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
         if (isset($unparsedLoadedData['workbook_rels']['calcChain'])) {
             foreach ($unparsedLoadedData['workbook_rels']['calcChain'] as $unparsedCalcChain) {
                 $this->writeRelationShip(
@@ -195,7 +195,7 @@ class Rels extends WriterPart
      */
     public function writeWorksheetRelationships(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $pWorksheet, $pWorksheetId = 1, $includeCharts = false)
     {
-		$unparsedLoadedData = $pWorksheet->getParent()->getUnparsedLoadedData();
+        $unparsedLoadedData = $pWorksheet->getParent()->getUnparsedLoadedData();
 
         // Create XML writer
         $objWriter = null;
@@ -214,7 +214,7 @@ class Rels extends WriterPart
 
         // Write drawing relationships?
         $d = 0;
-		$drawingOriginalIds = [];
+        $drawingOriginalIds = [];
         if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingOriginalIds'])) {
             $drawingOriginalIds = $unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['drawingOriginalIds'];
         }
@@ -286,7 +286,7 @@ class Rels extends WriterPart
             );
         }
 
-		// Write unparsed relationship?
+        // Write unparsed relationship?
         if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['ctrlProps'])) {
             foreach ($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['ctrlProps'] as $rId => $ctrlProp) {
                 $this->writeRelationship(

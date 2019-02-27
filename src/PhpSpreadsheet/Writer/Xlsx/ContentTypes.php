@@ -22,7 +22,7 @@ class ContentTypes extends WriterPart
      */
     public function writeContentTypes(Spreadsheet $spreadsheet, $includeCharts = false)
     {
-		$unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
+        $unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
 
         // Create XML writer
         $objWriter = null;
