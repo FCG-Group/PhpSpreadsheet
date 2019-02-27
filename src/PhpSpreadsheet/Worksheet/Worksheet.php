@@ -38,6 +38,13 @@ class Worksheet implements IComparable
     const SHEETSTATE_VERYHIDDEN = 'veryHidden';
 
     /**
+     * Maximum 31 characters allowed for sheet title.
+     *
+     * @var int
+     */
+    const SHEET_TITLE_MAXIMUM_LENGTH = 31;
+
+    /**
      * Invalid characters in sheet title.
      *
      * @var array
@@ -413,9 +420,9 @@ class Worksheet implements IComparable
             throw new Exception('Invalid character found in sheet code name');
         }
 
-        // Maximum 31 characters allowed for sheet title
-        if ($CharCount > 31) {
-            throw new Exception('Maximum 31 characters allowed in sheet code name.');
+        // Enforce maximum characters allowed for sheet title
+        if ($CharCount > self::SHEET_TITLE_MAXIMUM_LENGTH) {
+            throw new Exception('Maximum ' . self::SHEET_TITLE_MAXIMUM_LENGTH . ' characters allowed in sheet code name.');
         }
 
         return $pValue;
@@ -437,9 +444,9 @@ class Worksheet implements IComparable
             throw new Exception('Invalid character found in sheet title');
         }
 
-        // Maximum 31 characters allowed for sheet title
-        if (Shared\StringHelper::countCharacters($pValue) > 31) {
-            throw new Exception('Maximum 31 characters allowed in sheet title.');
+        // Enforce maximum characters allowed for sheet title
+        if (Shared\StringHelper::countCharacters($pValue) > self::SHEET_TITLE_MAXIMUM_LENGTH) {
+            throw new Exception('Maximum ' . self::SHEET_TITLE_MAXIMUM_LENGTH . ' characters allowed in sheet title.');
         }
 
         return $pValue;
@@ -1163,9 +1170,12 @@ class Worksheet implements IComparable
      */
     public function getCell($pCoordinate, $createIfNotExists = true)
     {
+        // Uppercase coordinate
+        $pCoordinateUpper = strtoupper($pCoordinate);
+
         // Check cell collection
-        if ($this->cellCollection->has(strtoupper($pCoordinate))) {
-            return $this->cellCollection->get($pCoordinate);
+        if ($this->cellCollection->has($pCoordinateUpper)) {
+            return $this->cellCollection->get($pCoordinateUpper);
         }
 
         // Worksheet reference?
@@ -1186,9 +1196,6 @@ class Worksheet implements IComparable
             }
         }
 
-        // Uppercase coordinate
-        $pCoordinate = strtoupper($pCoordinate);
-
         if (Coordinate::coordinateIsRange($pCoordinate)) {
             throw new Exception('Cell coordinate can not be a range of cells.');
         } elseif (strpos($pCoordinate, '$') !== false) {
@@ -1196,7 +1203,7 @@ class Worksheet implements IComparable
         }
 
         // Create new cell object, if required
-        return $createIfNotExists ? $this->cellCollection->createNewCell($pCoordinate) : null;
+        return $createIfNotExists ? $this->cellCollection->createNewCell($pCoordinateUpper) : null;
     }
 
     /**
@@ -1223,6 +1230,46 @@ class Worksheet implements IComparable
     }
 
     /**
+     * Create a new cell at the specified coordinate.
+     *
+     * @param string $pCoordinate Coordinate of the cell
+     *
+     * @return Cell Cell that was created
+     */
+    private function createNewCell($pCoordinate)
+    {
+        $cell = new Cell(null, DataType::TYPE_NULL, $this);
+        $this->cellCollection->add($pCoordinate, $cell);
+        $this->cellCollectionIsSorted = false;
+
+        // Coordinates
+        $aCoordinates = Coordinate::coordinateFromString($pCoordinate);
+        if (Coordinate::columnIndexFromString($this->cachedHighestColumn) < Coordinate::columnIndexFromString($aCoordinates[0])) {
+            $this->cachedHighestColumn = $aCoordinates[0];
+        }
+
+        if ($aCoordinates[1] > $this->cachedHighestRow) {
+            $this->cachedHighestRow = $aCoordinates[1];
+        }
+        
+        // Cell needs appropriate xfIndex from dimensions records
+        //    but don't create dimension records if they don't already exist
+        $rowDimension = $this->getRowDimension($aCoordinates[1], false);
+        $columnDimension = $this->getColumnDimension($aCoordinates[0], false);
+
+        if ($rowDimension !== null && $rowDimension->getXfIndex() > 0) {
+            // then there is a row dimension with explicit style, assign it to the cell
+            $cell->setXfIndex($rowDimension->getXfIndex());
+        } elseif ($columnDimension !== null && $columnDimension->getXfIndex() > 0) {
+            // then there is a column dimension, assign it to the cell
+            $cell->setXfIndex($columnDimension->getXfIndex());
+        }
+
+        return $cell;
+    }
+
+    /**
+
      * Does the cell at a specific coordinate exist?
      *
      * @param string $pCoordinate Coordinate of the cell eg: 'A1'
@@ -2665,12 +2712,12 @@ class Worksheet implements IComparable
     public static function extractSheetTitle($pRange, $returnRange = false)
     {
         // Sheet title included?
-        if (($sep = strpos($pRange, '!')) === false) {
-            return '';
+        if (($sep = strrpos($pRange, '!')) === false) {
+            return $returnRange ? ['', $pRange] : '';
         }
 
         if ($returnRange) {
-            return [trim(substr($pRange, 0, $sep), "'"), substr($pRange, $sep + 1)];
+            return [substr($pRange, 0, $sep), substr($pRange, $sep + 1)];
         }
 
         return substr($pRange, $sep + 1);
@@ -2899,13 +2946,14 @@ class Worksheet implements IComparable
                     $newCollection = $this->cellCollection->cloneCellCollection($this);
                     $this->cellCollection = $newCollection;
                 } elseif ($key == 'drawingCollection') {
-                    $newCollection = new ArrayObject();
-                    foreach ($this->drawingCollection as $id => $item) {
+                    $currentCollection = $this->drawingCollection;
+                    $this->drawingCollection = new ArrayObject();
+                    foreach ($currentCollection as $item) {
                         if (is_object($item)) {
-                            $newCollection[$id] = clone $this->drawingCollection[$id];
+                            $newDrawing = clone $item;
+                            $newDrawing->setWorksheet($this);
                         }
                     }
-                    $this->drawingCollection = $newCollection;
                 } elseif (($key == 'autoFilter') && ($this->autoFilter instanceof AutoFilter)) {
                     $newAutoFilter = clone $this->autoFilter;
                     $this->autoFilter = $newAutoFilter;
@@ -2994,6 +3042,6 @@ class Worksheet implements IComparable
      */
     public function hasCodeName()
     {
-        return !($this->codeName === null);
+        return $this->codeName !== null;
     }
 }

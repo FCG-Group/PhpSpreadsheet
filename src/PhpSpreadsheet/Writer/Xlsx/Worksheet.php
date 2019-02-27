@@ -247,6 +247,7 @@ class Worksheet extends WriterPart
         }
 
         $activeCell = $pSheet->getActiveCell();
+        $sqref = $pSheet->getSelectedCells();
 
         // Pane
         $pane = '';
@@ -258,6 +259,7 @@ class Worksheet extends WriterPart
 
             $topLeftCell = $pSheet->getTopLeftCell();
             $activeCell = $topLeftCell;
+            $sqref = $topLeftCell;
 
             // pane
             $pane = 'topRight';
@@ -293,7 +295,7 @@ class Worksheet extends WriterPart
             $objWriter->writeAttribute('pane', $pane);
         }
         $objWriter->writeAttribute('activeCell', $activeCell);
-        $objWriter->writeAttribute('sqref', $pSheet->getSelectedCells());
+        $objWriter->writeAttribute('sqref', $sqref);
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -625,6 +627,7 @@ class Worksheet extends WriterPart
 
                 if ($hyperlink->getTooltip() != '') {
                     $objWriter->writeAttribute('tooltip', $hyperlink->getTooltip());
+                    $objWriter->writeAttribute('display', $hyperlink->getTooltip());
                 }
 
                 $objWriter->endElement();
@@ -747,9 +750,7 @@ class Worksheet extends WriterPart
             $range = Coordinate::splitRange($autoFilterRange);
             $range = $range[0];
             //    Strip any worksheet ref
-            if (strpos($range[0], '!') !== false) {
-                list($ws, $range[0]) = explode('!', $range[0]);
-            }
+            list($ws, $range[0]) = PhpspreadsheetWorksheet::extractSheetTitle($range[0], true);
             $range = implode(':', $range);
 
             $objWriter->writeAttribute('ref', str_replace('$', '', $range));
@@ -856,6 +857,7 @@ class Worksheet extends WriterPart
         if (isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId'])) {
             $objWriter->writeAttribute('r:id', $pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['pageSetupRelId']);
         }
+
 
         $objWriter->endElement();
     }
@@ -1159,6 +1161,7 @@ class Worksheet extends WriterPart
     private function writeDrawings(XMLWriter $objWriter, PhpspreadsheetWorksheet $pSheet, $includeCharts = false)
     {
         $hasUnparsedDrawing = isset($pSheet->getParent()->unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds']);
+        $hasUnparsedDrawing = isset($unparsedLoadedData['sheets'][$pSheet->getCodeName()]['drawingOriginalIds']);
         $chartCount = ($includeCharts) ? $pSheet->getChartCollection()->count() : 0;
         if ($chartCount == 0 && $pSheet->getDrawingCollection()->count() == 0 && !$hasUnparsedDrawing) {
             return;

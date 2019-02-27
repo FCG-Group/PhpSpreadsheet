@@ -89,6 +89,7 @@ class ContentTypes extends WriterPart
         $this->writeOverrideContentType($objWriter, '/xl/sharedStrings.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml');
 
         // Add worksheet relationship content types
+        $unparsedLoadedData = $spreadsheet->getUnparsedLoadedData();
         $chart = 1;
         for ($i = 0; $i < $sheetCount; ++$i) {
             $drawings = $spreadsheet->getSheet($i)->getDrawingCollection();

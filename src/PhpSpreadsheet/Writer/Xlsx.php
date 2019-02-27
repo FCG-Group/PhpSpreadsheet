@@ -137,9 +137,9 @@ class Xlsx extends BaseWriter
         }
 
         $hashTablesArray = ['stylesConditionalHashTable', 'fillHashTable', 'fontHashTable',
-                                    'bordersHashTable', 'numFmtHashTable', 'drawingHashTable',
-                                    'styleHashTable',
-                                ];
+            'bordersHashTable', 'numFmtHashTable', 'drawingHashTable',
+            'styleHashTable',
+        ];
 
         // Set HashTable variables
         foreach ($hashTablesArray as $tableName) {
@@ -327,6 +327,7 @@ class Xlsx extends BaseWriter
                         $zip->addFromString($ctrlProp['filePath'], $ctrlProp['content']);
                     }
                 }
+
 
                 $drawings = $this->spreadSheet->getSheet($i)->getDrawingCollection();
                 $drawingCount = count($drawings);
