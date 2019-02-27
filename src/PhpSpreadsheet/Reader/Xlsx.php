@@ -729,7 +729,14 @@ class Xlsx extends BaseReader
                     }
 
                     // Set protection
-                    $this->readProtection($excel, $xmlWorkbook);
+                    $this->readProtection($excel, $xmlWorkbook, $unparsedLoadedData);
+
+                    // Set workbookView
+                    /*
+                    if ($xmlWorkbook->bookViews && $xmlWorkbook->bookViews->workbookView) {
+                        // activeTab will be setup later
+                    }
+                    */
 
                     $sheetId = 0; // keep track of new sheet id in final workbook
                     $oldSheetId = -1; // keep track of old sheet id in final workbook
@@ -2494,7 +2501,7 @@ class Xlsx extends BaseReader
         $objDrawing->setHyperlink($hyperlink);
     }
 
-    private function readProtection(Spreadsheet $excel, SimpleXMLElement $xmlWorkbook)
+    private function readProtection(Spreadsheet $excel, SimpleXMLElement $xmlWorkbook, &$unparsedLoadedData)
     {
         if (!$xmlWorkbook->workbookProtection) {
             return;
@@ -2518,7 +2525,15 @@ class Xlsx extends BaseReader
 
         if ($xmlWorkbook->workbookProtection['workbookPassword']) {
             $excel->getSecurity()->setWorkbookPassword((string) $xmlWorkbook->workbookProtection['workbookPassword'], true);
-        }
+		}
+
+		// unparsed
+		if ($xmlWorkbook->workbookProtection['workbookAlgorithmName']) {
+			$unparsedLoadedData['workbookProtection']['workbookAlgorithmName'] = (string) $xmlWorkbook->workbookProtection['workbookAlgorithmName'];
+			$unparsedLoadedData['workbookProtection']['workbookHashValue'] = (string) $xmlWorkbook->workbookProtection['workbookHashValue'];
+			$unparsedLoadedData['workbookProtection']['workbookSaltValue'] = (string) $xmlWorkbook->workbookProtection['workbookSaltValue'];
+			$unparsedLoadedData['workbookProtection']['workbookSpinCount'] = (string) $xmlWorkbook->workbookProtection['workbookSpinCount'];
+		}
     }
 
     private function readFormControlProperties(Spreadsheet $excel, ZipArchive $zip, $dir, $fileWorksheet, $docSheet, array &$unparsedLoadedData)
