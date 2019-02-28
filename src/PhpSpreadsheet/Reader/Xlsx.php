@@ -454,7 +454,7 @@ class Xlsx extends BaseReader
                     $unparsedCalcChain[$rId] = [];
                     $unparsedCalcChain[$rId]['contentType'] = $rel['Type'];
                     $unparsedCalcChain[$rId]['fileName'] = $rel['Target'];
-                    $unparsedCalcChain[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, 'xl/' . $rel['Target']));
+                    $unparsedCalcChain[$rId]['content'] = $this->securityScanner->scan($this->getFromZipArchive($zip, 'xl/' . $rel['Target']));
                     unset($unparsedCalcChain);
 
                     break;
@@ -1830,7 +1830,7 @@ class Xlsx extends BaseReader
                             if ($zip->locateName(dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')) {
                                 $relsWorksheet = simplexml_load_string(
                                     //~ http://schemas.openxmlformats.org/package/2006/relationships"
-                                    $this->securityScan(
+                                    $this->securityScanner->scan(
                                         $this->getFromZipArchive($zip, dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')
                                     ),
                                     'SimpleXMLElement',
@@ -1849,7 +1849,7 @@ class Xlsx extends BaseReader
                                     $unparsedCtrlProps[$rId] = [];
                                     $unparsedCtrlProps[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $ctrlProp['Target']);
                                     $unparsedCtrlProps[$rId]['relFilePath'] = (string) $ctrlProp['Target'];
-                                    $unparsedCtrlProps[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, $unparsedCtrlProps[$rId]['filePath']));
+                                    $unparsedCtrlProps[$rId]['content'] = $this->securityScanner->scan($this->getFromZipArchive($zip, $unparsedCtrlProps[$rId]['filePath']));
                                 }
                                 unset($unparsedCtrlProps);
                             }
@@ -1858,7 +1858,7 @@ class Xlsx extends BaseReader
                             if ($zip->locateName(dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')) {
                                 $relsWorksheet = simplexml_load_string(
                                     //~ http://schemas.openxmlformats.org/package/2006/relationships"
-                                    $this->securityScan(
+                                    $this->securityScanner->scan(
                                         $this->getFromZipArchive($zip, dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')
                                     ),
                                     'SimpleXMLElement',
@@ -1877,7 +1877,7 @@ class Xlsx extends BaseReader
                                     $unparsedPrinterSettings[$rId] = [];
                                     $unparsedPrinterSettings[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $printerSettings['Target']);
                                     $unparsedPrinterSettings[$rId]['relFilePath'] = (string) $printerSettings['Target'];
-                                    $unparsedPrinterSettings[$rId]['content'] = $this->securityScan($this->getFromZipArchive($zip, $unparsedPrinterSettings[$rId]['filePath']));
+                                    $unparsedPrinterSettings[$rId]['content'] = $this->securityScanner->scan($this->getFromZipArchive($zip, $unparsedPrinterSettings[$rId]['filePath']));
                                 }
                                 unset($unparsedPrinterSettings);
                             }
@@ -2525,15 +2525,15 @@ class Xlsx extends BaseReader
 
         if ($xmlWorkbook->workbookProtection['workbookPassword']) {
             $excel->getSecurity()->setWorkbookPassword((string) $xmlWorkbook->workbookProtection['workbookPassword'], true);
-		}
+        }
 
-		// unparsed
-		if ($xmlWorkbook->workbookProtection['workbookAlgorithmName']) {
-			$unparsedLoadedData['workbookProtection']['workbookAlgorithmName'] = (string) $xmlWorkbook->workbookProtection['workbookAlgorithmName'];
-			$unparsedLoadedData['workbookProtection']['workbookHashValue'] = (string) $xmlWorkbook->workbookProtection['workbookHashValue'];
-			$unparsedLoadedData['workbookProtection']['workbookSaltValue'] = (string) $xmlWorkbook->workbookProtection['workbookSaltValue'];
-			$unparsedLoadedData['workbookProtection']['workbookSpinCount'] = (string) $xmlWorkbook->workbookProtection['workbookSpinCount'];
-		}
+        // unparsed
+        if ($xmlWorkbook->workbookProtection['workbookAlgorithmName']) {
+            $unparsedLoadedData['workbookProtection']['workbookAlgorithmName'] = (string) $xmlWorkbook->workbookProtection['workbookAlgorithmName'];
+            $unparsedLoadedData['workbookProtection']['workbookHashValue'] = (string) $xmlWorkbook->workbookProtection['workbookHashValue'];
+            $unparsedLoadedData['workbookProtection']['workbookSaltValue'] = (string) $xmlWorkbook->workbookProtection['workbookSaltValue'];
+            $unparsedLoadedData['workbookProtection']['workbookSpinCount'] = (string) $xmlWorkbook->workbookProtection['workbookSpinCount'];
+        }
     }
 
     private function readFormControlProperties(Spreadsheet $excel, ZipArchive $zip, $dir, $fileWorksheet, $docSheet, array &$unparsedLoadedData)
