@@ -230,7 +230,7 @@ class Rels extends WriterPart
             $rId = ++$d;
 
             if (isset($drawingOriginalIds[$relPath])) {
-                $rId = (int) (substr($drawingOriginalIds[$relPath], 3));
+                $rId = $drawingOriginalIds[$relPath];		// without counter, because it already has own counter
             }
 
             $this->writeRelationship(
@@ -287,37 +287,6 @@ class Rels extends WriterPart
         }
 
         // Write unparsed relationship?
-        if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['ctrlProps'])) {
-            foreach ($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['ctrlProps'] as $rId => $ctrlProp) {
-                $this->writeRelationship(
-                    $objWriter,
-                    $rId,
-                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/ctrlProp',
-                    $ctrlProp['relFilePath']
-                );
-            }
-        }
-        if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['vmlDrawings'])) {
-            foreach ($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['vmlDrawings'] as $rId => $vmlDrawing) {
-                $this->writeRelationship(
-                    $objWriter,
-                    $rId,
-                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing',
-                    $vmlDrawing['relFilePath']
-                );
-            }
-        }
-        if (isset($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['printerSettings'])) {
-            foreach ($unparsedLoadedData['sheets'][$pWorksheet->getCodeName()]['printerSettings'] as $rId => $printerSettings) {
-                $this->writeRelationship(
-                    $objWriter,
-                    $rId,
-                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings',
-                    $printerSettings['relFilePath']
-                );
-            }
-        }
-
         $this->writeUnparsedRelationship($pWorksheet, $objWriter, 'ctrlProps', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/ctrlProp');
         $this->writeUnparsedRelationship($pWorksheet, $objWriter, 'vmlDrawings', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing');
         $this->writeUnparsedRelationship($pWorksheet, $objWriter, 'printerSettings', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings');

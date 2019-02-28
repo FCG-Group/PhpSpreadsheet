@@ -1826,62 +1826,6 @@ class Xlsx extends BaseReader
                                 }
                             }
 
-                            // form control properties
-                            if ($zip->locateName(dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')) {
-                                $relsWorksheet = simplexml_load_string(
-                                    //~ http://schemas.openxmlformats.org/package/2006/relationships"
-                                    $this->securityScanner->scan(
-                                        $this->getFromZipArchive($zip, dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')
-                                    ),
-                                    'SimpleXMLElement',
-                                    Settings::getLibXmlLoaderOptions()
-                                );
-                                $ctrlProps = [];
-                                foreach ($relsWorksheet->Relationship as $ele) {
-                                    if ($ele['Type'] == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/ctrlProp') {
-                                        $ctrlProps[(string) $ele['Id']] = $ele;
-                                    }
-                                }
-
-                                $unparsedCtrlProps = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['ctrlProps'];
-                                foreach ($ctrlProps as $rId => $ctrlProp) {
-                                    $rId = substr($rId, 3);  // rIdXXX
-                                    $unparsedCtrlProps[$rId] = [];
-                                    $unparsedCtrlProps[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $ctrlProp['Target']);
-                                    $unparsedCtrlProps[$rId]['relFilePath'] = (string) $ctrlProp['Target'];
-                                    $unparsedCtrlProps[$rId]['content'] = $this->securityScanner->scan($this->getFromZipArchive($zip, $unparsedCtrlProps[$rId]['filePath']));
-                                }
-                                unset($unparsedCtrlProps);
-                            }
-
-                            // printer settings
-                            if ($zip->locateName(dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')) {
-                                $relsWorksheet = simplexml_load_string(
-                                    //~ http://schemas.openxmlformats.org/package/2006/relationships"
-                                    $this->securityScanner->scan(
-                                        $this->getFromZipArchive($zip, dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels')
-                                    ),
-                                    'SimpleXMLElement',
-                                    Settings::getLibXmlLoaderOptions()
-                                );
-                                $sheetPrinterSettings = [];
-                                foreach ($relsWorksheet->Relationship as $ele) {
-                                    if ($ele['Type'] == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/printerSettings') {
-                                        $sheetPrinterSettings[(string) $ele['Id']] = $ele;
-                                    }
-                                }
-
-                                $unparsedPrinterSettings = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['printerSettings'];
-                                foreach ($sheetPrinterSettings as $rId => $printerSettings) {
-                                    $rId = substr($rId, 3);  // rIdXXX
-                                    $unparsedPrinterSettings[$rId] = [];
-                                    $unparsedPrinterSettings[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $printerSettings['Target']);
-                                    $unparsedPrinterSettings[$rId]['relFilePath'] = (string) $printerSettings['Target'];
-                                    $unparsedPrinterSettings[$rId]['content'] = $this->securityScanner->scan($this->getFromZipArchive($zip, $unparsedPrinterSettings[$rId]['filePath']));
-                                }
-                                unset($unparsedPrinterSettings);
-                            }
-
                             $this->readFormControlProperties($excel, $zip, $dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
                             $this->readPrinterSettings($excel, $zip, $dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
 
